@@ -27,6 +27,7 @@ public class Test : MonoBehaviour
 
     public bool beatJudge = true;
 
+    private float beatLong = 0.2f; //节拍长度
     private float heavyBeatTimer = 0.0f;
     public float timeToNextBeat = 1.0f; //节拍间隔
 
@@ -40,7 +41,7 @@ public class Test : MonoBehaviour
         frequencies[0] = 0f;
         frequencies[1] = 0f;
         frequencies[2] = 0f;
-        frequencies[3] = 80.0f;
+        frequencies[3] = 0.0f;
     }
 
     private void Update()
@@ -49,13 +50,17 @@ public class Test : MonoBehaviour
         //节拍器，默认一拍0.2秒（可调整），通过调整timeToNextBeat可以调整节拍间隔， 0.2(最好不要)<timeToNextBeat
         heavyBeatTimer += Time.deltaTime;
 
-        if (heavyBeatTimer >= 0.2f && heavyBeatTimer < timeToNextBeat)
+        if (heavyBeatTimer <= beatLong)
+        {
+            frequencies[3] = 50.0f * beatADS(heavyBeatTimer);
+        }
+        if (heavyBeatTimer > beatLong && heavyBeatTimer < timeToNextBeat)
         {
             frequencies[3] = 0.0f;
         }
         if (heavyBeatTimer >= timeToNextBeat)
         {
-            frequencies[3] = 80.0f;
+            //frequencies[3] = 80.0f;
             heavyBeatTimer = 0.0f;
         }
 
@@ -175,4 +180,22 @@ public class Test : MonoBehaviour
     {
         return input < 0.5 ? 1 : -1;
     }
+
+    //节拍器包络
+    public float beatADS(float input)
+    {
+        if (input <= beatLong / 8)
+        {
+            return (float)(8 * 1.3 / beatLong * input);
+        }
+        else if(input > beatLong / 8 && input <= beatLong / 4)
+        {
+            return (float)(-2.4 / beatLong * input + 1.6);
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
 }
